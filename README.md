@@ -10,6 +10,6 @@ Currently, two official plugins are available:
 
 ## Changelog
 
-### [Unreleased]
+### 3 Sep 2024
 - Fixed React Hook dependency warning in App.jsx
 - Improved performance by correctly memoizing the debouncedSearch function
