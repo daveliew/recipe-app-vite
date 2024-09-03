@@ -1,11 +1,21 @@
 import React from 'react';
 
 function RecipeDetails({ recipe, onClose }) {
+  const handleImageError = (event) => {
+    event.target.style.display = 'none';
+  };
+
   return (
     <div className="recipe-details">
       <button onClick={onClose}>Close</button>
       <h2>{recipe.title}</h2>
-      <img src={recipe.image} alt={recipe.title} />
+      {recipe.image && (
+        <img 
+          src={recipe.image} 
+          alt={recipe.title} 
+          onError={handleImageError}
+        />
+      )}
       <p>Ready in {recipe.readyInMinutes} minutes</p>
       <p>Servings: {recipe.servings}</p>
       

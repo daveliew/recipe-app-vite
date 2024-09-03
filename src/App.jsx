@@ -43,11 +43,9 @@ function App() {
       }
       setLoading(true);
       searchRecipes(term)
-        .then(response => {
-          console.log('Recipes fetched:', response);
-          // The API returns an object with a 'results' property containing the recipes array
-          const results = response.results || [];
-          setRecipes(results);
+        .then((data) => {
+          console.log('Recipes fetched:', data);
+          setRecipes(data.results || []);
           setQuotaExceeded(false);
           setError(null);
         })
@@ -97,6 +95,10 @@ function App() {
     setLoading(false);
   };
 
+  const handleImageError = (event) => {
+    event.target.style.display = 'none';
+  };
+
   return (
     <div className="App">
       <h1>My Recipe App</h1>
@@ -120,7 +122,13 @@ function App() {
           <ul>
             {recipes.map(recipe => (
               <li key={recipe.id} onClick={() => handleRecipeClick(recipe.id)}>
-                <img src={recipe.image} alt={recipe.title} />
+                {recipe.image && (
+                  <img 
+                    src={recipe.image} 
+                    alt={recipe.title} 
+                    onError={handleImageError}
+                  />
+                )}
                 <h3>{recipe.title}</h3>
               </li>
             ))}
@@ -129,6 +137,7 @@ function App() {
           <p>No recipes found. Try searching for something!</p>
         )}
       </div>
+
       {selectedRecipe && (
         <RecipeDetails 
           recipe={selectedRecipe} 

@@ -18,6 +18,7 @@ export const searchRecipes = async (query) => {
         fillIngredients: true
       }
     });
+    
     return response.data;
   } catch (error) {
     console.error('Error in searchRecipes:', error);
@@ -31,6 +32,6 @@ export const getRecipeDetails = async (id) => {
     return response.data;
   } catch (error) {
     console.error('Error fetching recipe details:', error);
-    throw new Error('An error occurred while fetching recipe details');
+    throw error;
   }
 };
