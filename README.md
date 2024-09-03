@@ -1,6 +1,6 @@
 # React + Vite app
 
-Toy project created to explore cursor_ai and Claude
+Toy project created to explore cursor_ai and Claude - https://dave-recipe-app.netlify.app/
 
 ## Changelog
 
