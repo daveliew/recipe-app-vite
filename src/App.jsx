@@ -8,17 +8,21 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(false)
   const [selectedRecipe, setSelectedRecipe] = useState(null)
+  const [searchResults, setSearchResults] = useState([])
 
   const debouncedSearch = useCallback(
     (term) => {
+      console.log("debouncedSearch called with:", term);
       const search = debounce((term) => {
-        if (term.length >= 3) {
+        console.log("debounced function executing with:", term);
+        if (term && term.length >= 3) {
           setLoading(true)
           console.log('Fetching recipes...')
           searchRecipes(term)
             .then(results => {
               console.log('Recipes fetched:', results)
               setRecipes(results)
+              setSearchResults(results || [])
               setLoading(false)
             })
             .catch(error => {
@@ -30,7 +34,7 @@ function App() {
           setRecipes([])
         }
       }, 300);
-      search(term);
+      if (term) search(term);
     },
     []
   )
