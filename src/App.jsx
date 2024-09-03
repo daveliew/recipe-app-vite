@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { searchRecipes, getRecipeDetails } from './api'
 import RecipeDetails from './RecipeDetails'
 import './App.css'
@@ -9,26 +9,37 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [selectedRecipe, setSelectedRecipe] = useState(null)
 
+  const debouncedSearch = useCallback(
+    (term) => {
+      const search = debounce((term) => {
+        if (term.length >= 3) {
+          setLoading(true)
+          console.log('Fetching recipes...')
+          searchRecipes(term)
+            .then(results => {
+              console.log('Recipes fetched:', results)
+              setRecipes(results)
+              setLoading(false)
+            })
+            .catch(error => {
+              console.error('Error fetching recipes:', error)
+              setLoading(false)
+            })
+        } else {
+          console.log('Clearing recipes')
+          setRecipes([])
+        }
+      }, 300);
+      search(term);
+    },
+    []
+  )
+
   useEffect(() => {
     console.log('Search term changed:', searchTerm)
-    if (searchTerm.length >= 3) {
-      setLoading(true)
-      console.log('Fetching recipes...')
-      searchRecipes(searchTerm)
-        .then(results => {
-          console.log('Recipes fetched:', results)
-          setRecipes(results)
-          setLoading(false)
-        })
-        .catch(error => {
-          console.error('Error fetching recipes:', error)
-          setLoading(false)
-        })
-    } else {
-      console.log('Clearing recipes')
-      setRecipes([])
-    }
-  }, [searchTerm])
+    debouncedSearch(searchTerm)
+    return () => debouncedSearch.cancel()
+  }, [searchTerm, debouncedSearch])
 
   const handleRecipeClick = async (id) => {
     setLoading(true)
@@ -42,10 +53,6 @@ function App() {
   }
 
   console.log('Rendering. Recipes:', recipes, 'Loading:', loading)
-
-  useEffect(() => {
-    console.log('App component mounted')
-  }, [])
 
   return (
     <div className="App">
@@ -80,6 +87,19 @@ function App() {
       )}
     </div>
   )
+}
+
+// Debounce function
+function debounce(func, wait) {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
 }
 
 export default App

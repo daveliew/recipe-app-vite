@@ -1,25 +1,35 @@
+import axios from 'axios';
+
 const API_KEY = import.meta.env.VITE_SPOONACULAR_API_KEY;
 const BASE_URL = 'https://api.spoonacular.com/recipes';
 
-export async function searchRecipes(query) {
-    const params = new URLSearchParams({
-      apiKey: API_KEY,
-      query: query,
-      number: '10',
-      addRecipeInformation: 'true',
-      fillIngredients: 'true',
-      instructionsRequired: 'true',
-      titleMatch: query,
-      sort: 'popularity',
-      sortDirection: 'desc'
-    });
+let cancelToken;
 
-    console.log('Fetching from URL:', `${BASE_URL}/complexSearch?${params}`)
-    const response = await fetch(`${BASE_URL}/complexSearch?${params}`);
-    const data = await response.json();
-    console.log('API response:', data)
-    return data.results;
-}
+export const searchRecipes = async (query) => {
+  if (cancelToken) {
+    cancelToken.cancel("Operation canceled due to new request.");
+  }
+  cancelToken = axios.CancelToken.source();
+
+  try {
+    const response = await axios.get(`${BASE_URL}/complexSearch`, {
+      params: {
+        apiKey: API_KEY,
+        query: query,
+        number: 10
+      },
+      cancelToken: cancelToken.token
+    });
+    return response.data.results;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log('Request canceled', error.message);
+    } else {
+      console.error('Error fetching recipes:', error);
+    }
+    return [];
+  }
+};
 
 export async function getRecipeDetails(id) {
     const response = await fetch(
